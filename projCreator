@@ -1,0 +1,133 @@
+#!/bin/bash
+
+
+declare -A languages
+languages=( ["1"]="c" ["2"]="python" )
+
+echo "Choose a language:"
+for key in $(echo "${!languages[@]}" | tr ' ' '\n' | sort -n); do
+  echo "[$key] -> ${languages[$key]}"
+done
+
+read language_choice
+echo ""
+
+if [ -z "${languages[$language_choice]}" ]; then
+  echo "Invalid choice selected. Please choose a valid option."
+  exit 1
+fi
+
+language=${languages[$language_choice]}
+
+echo "Enter the main filename:"
+read filename
+echo ""
+
+if [ -z "$filename" ]; then
+  echo "Filename cannot be empty."
+  exit 1
+fi
+
+echo "You have chosen $language with main filename $filename"
+
+echo "Is the information correct? (y/n)"
+read confirmation
+
+if [ "$confirmation" != "y" ]; then
+  echo "Operation cancelled."
+  exit 1
+fi
+
+# Create the include and src directories for the C project
+if [ "$language" == "c" ]; then
+  mkdir -p include src
+
+  # Create a header file in the include directory
+  echo "/*" > "include/${filename}.h"
+  echo "** EPITECH PROJECT, 2024" >> "include/${filename}.h"
+  echo "** ${filename}" >> "include/${filename}.h"
+  echo "** File description:" >> "include/${filename}.h"
+  echo "** ${filename}.h" >> "include/${filename}.h"
+  echo "*/" >> "include/${filename}.h"
+  echo "" >> "include/${filename}.h"
+  echo "#ifndef ${filename^^}_H" >> "include/${filename}.h"
+  echo "#define ${filename^^}_H" >> "include/${filename}.h"
+  echo "" >> "include/${filename}.h"
+  echo "#endif // ${filename^^}_H" >> "include/${filename}.h"
+
+  # Create a source file in the src directory
+  echo "/*" > "src/${filename}.c"
+  echo "** EPITECH PROJECT, 2024" >> "src/${filename}.c"
+  echo "** ${filename}" >> "src/${filename}.c"
+  echo "** File description:" >> "src/${filename}.c"
+  echo "** ${filename}.c" >> "src/${filename}.c"
+  echo "*/" >> "src/${filename}.c"
+  echo "" >> "src/${filename}.c"
+  echo "#include <stdio.h>" >> "src/${filename}.c"
+  echo "#include \"../include/${filename}.h\"" >> "src/${filename}.c"
+  echo "int main() {" >> "src/${filename}.c"
+  echo "    printf(\"Hello, World!\\n\");" >> "src/${filename}.c"
+  echo "    return 0;" >> "src/${filename}.c"
+  echo "}" >> "src/${filename}.c"
+
+  # Prompt the user to ask if they want to import the library
+  echo "Do you want to import the library? (y/n)"
+  read import_lib
+  echo ""
+
+  if [ "$import_lib" == "y" ]; then
+    # Create the lib directory and copy the library files
+    mkdir -p lib
+    cp -r ~/my_clib/* lib/
+  fi
+
+  # Create a Makefile
+  echo "##" > Makefile
+  echo "## EPITECH PROJECT, 2024" >> Makefile
+  echo "## ${filename}" >> Makefile
+  echo "## File description:" >> Makefile
+  echo "## Makefile" >> Makefile
+  echo "##" >> Makefile
+  echo "" >> Makefile
+  echo "CC = gcc" >> Makefile
+  echo "CFLAGS = -Iinclude -Wall -Wextra -Werror" >> Makefile
+  echo "SRC = src/${filename}.c" >> Makefile
+  echo "OBJ = \$(SRC:.c=.o)" >> Makefile
+  echo "TARGET = ${filename}" >> Makefile
+  echo "" >> Makefile
+  echo "all: \$(TARGET)" >> Makefile
+  echo "" >> Makefile
+  echo "\$(TARGET): \$(OBJ)" >> Makefile
+  if [ "$import_lib" == "y" ]; then
+    echo "	\$(MAKE) -C lib" >> Makefile
+    echo "	\$(CC) -o \$@ \$^ -Llib -lmy" >> Makefile
+  else
+    echo "	\$(CC) -o \$@ \$^" >> Makefile
+  fi
+  echo "" >> Makefile
+  echo "clean:" >> Makefile
+  echo "	rm -f \$(OBJ)" >> Makefile
+  if [ "$import_lib" == "y" ]; then
+    echo "	\$(MAKE) -C lib clean" >> Makefile
+  fi
+  echo "" >> Makefile
+  echo "fclean: clean" >> Makefile
+  echo "	rm -f \$(TARGET)" >> Makefile
+  if [ "$import_lib" == "y" ]; then
+    echo "	\$(MAKE) -C lib fclean" >> Makefile
+  fi
+  echo "" >> Makefile
+  echo "re: fclean all" >> Makefile
+elif [ "$language" == "python" ]; then
+  # Create a main.py file with a basic Python script
+  echo '"""' > "${filename}.py"
+  echo "Filename: ${filename}.py" >> "${filename}.py"
+  echo "Description: Main file for the Python project" >> "${filename}.py"
+  echo '"""' >> "${filename}.py"
+  echo "" >> "${filename}.py"
+  echo "def main():" >> "${filename}.py"
+  echo "    print(\"Hello, World!\")" >> "${filename}.py"
+  echo "" >> "${filename}.py"
+  echo "if __name__ == \"__main__\":" >> "${filename}.py"
+  echo "    main()" >> "${filename}.py"
+fi
