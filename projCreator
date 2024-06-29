@@ -76,9 +76,20 @@ if [ "$language" == "c" ]; then
   echo ""
 
   if [ "$import_lib" == "y" ]; then
-    # Create the lib directory and copy the library files
-    mkdir -p lib
-    cp -r ~/my_clib/* lib/
+    echo "Enter the path to your library:"
+    read lib_path
+
+    # Expand the ~ character if present
+    lib_path=$(eval echo "$lib_path")
+
+    if [ -d "$lib_path" ]; then
+      # Create the lib directory and copy the library files
+      mkdir -p lib
+      cp -r "$lib_path"/* lib/
+    else
+      echo "Library path not found. Proceeding without importing the library."
+      import_lib="n"
+    fi
   fi
 
   # Create a Makefile
