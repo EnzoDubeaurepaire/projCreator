@@ -51,7 +51,12 @@ if [ "$language" == "c" ]; then
   echo "*/" >> "include/${filename}.h"
   echo "" >> "include/${filename}.h"
   echo "#ifndef ${filename^^}_H" >> "include/${filename}.h"
-  echo "#define ${filename^^}_H" >> "include/${filename}.h"
+  echo "    #define ${filename^^}_H" >> "include/${filename}.h"
+  echo "    #ifdef DEBUG" >> "include/${filename}.h"
+  echo "        #define LOG(str, ...) printf(str, __VA_ARGS__)" >> "include/${filename}.h"
+  echo "    #else >> "include/${filename}.h"
+  echo "        #define LOG(str, ...)" >> "include/${filename}.h"
+  echo "    #endif" >> "include/${filename}.h"
   echo "" >> "include/${filename}.h"
   echo "#endif // ${filename^^}_H" >> "include/${filename}.h"
 
