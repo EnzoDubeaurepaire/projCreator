@@ -121,6 +121,14 @@ if [ "$language" == "c" ]; then
     echo "	\$(CC) -o \$@ \$^" >> Makefile
   fi
   echo "" >> Makefile
+  echo "debug:" >> Makefile
+  if [ "$import_lib" == "y" ]; then
+    echo "	\$(MAKE) -C lib" >> Makefile
+    echo "	\$(CC) -DDEBUG -o \$@ \$^ -Llib -lmy" >> Makefile
+  else
+    echo "	\$(CC) -DDEBUG -o \$@ \$^" >> Makefile
+  fi
+  echo "" >> Makefile
   echo "clean:" >> Makefile
   echo "	rm -f \$(OBJ)" >> Makefile
   if [ "$import_lib" == "y" ]; then
